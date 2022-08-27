@@ -1,3 +1,4 @@
+from email import message
 from urllib import request
 from .models import User
 from .serializers import *
@@ -5,6 +6,7 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from .commons.message import *
 
 
 
@@ -13,7 +15,7 @@ class UserList(APIView):
     def get(self, request, format=None):
         userData = User.objects.all()
         serializer = UserSerializer(userData, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'message': USER_FOUND_SUCCESS, 'data': serializer.data}, status=status.HTTP_200_OK)
 
 
 
@@ -23,7 +25,7 @@ class UserCreateView(APIView):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({'message': USER_CREATED_SUCCESS,'data': serializer.data}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -41,7 +43,7 @@ class UserUpdateView(APIView):
         serializer = UserSerializer(userData, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response({'message': USER_UPDATED_SUCCESS,'data': serializer.data})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -57,4 +59,4 @@ class UserDeleteView(APIView):
     def delete(self, request, pk, format=None):
         userData = self.get_object(pk)
         userData.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({'message': USER_DELETED_SUCCESS}, status=status.HTTP_204_NO_CONTENT)
